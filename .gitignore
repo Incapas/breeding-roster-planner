@@ -1,0 +1,9 @@
+# Fichiers système macOS
+.DS_Store
+
+# Données créées par la page dans le dossier : elles contiennent des données personnelles
+planning-elevage-donnees.json
+planning-elevage.log
+
+# Sauvegardes téléchargées depuis Réglages
+sauvegarde-planning-elevage_*.json
