@@ -130,21 +130,21 @@ Toutes les règles de calcul sont dans le module `Core` de `planning-elevage.htm
 | Saison | Été du dernier dimanche de mars (inclus) au dernier dimanche d'octobre (exclu), ou entre deux dates fixes au choix (Réglages) | `isSummer()` |
 | Gérant | Personne cochée « Gérant » : sa présence est notée, **aucune heure n'est comptée**, il n'a ni objectif d'heures, ni repos imposé, ni congés déduits | `manager` dans les données |
 | Activité | Texte libre saisi pour chaque créneau (par exemple « Élevage », « Magasin »). Un créneau n'a pas de nom : il est désigné par son activité et ses horaires d'hiver, « Élevage 9h–13h » (`shiftLabel()`). Les créneaux de même activité, sans tenir compte des majuscules, sont additionnés ensemble | `activitiesOf()` |
-| Jours fériés | Non pris en compte | — |
+| Jours fériés | Saisis à la main dans Réglages : affichés au planning ; un congé posé ce jour-là n'est pas décompté | `holidayOf()`, `leaveCounts()` |
 
 ### 2.2 Heures du mois d'un salarié
 
 ```
 heures prévues   = somme des durées des créneaux où la personne est placée dans le mois
 heures de congé  = jours de congé déduits × valeur d'un jour de congé            (voir 2.3)
-heures à faire   = heures du contrat − heures de congé                           (au moins 0)
+heures à faire   = heures du contrat − heures de congé − compteur d'heures sup.  (au moins 0, voir 2.5)
 écart            = heures à faire − heures prévues
 ```
 
 Fonction : `targetOf()`, utilisée à la fois par la génération (`propose()`) et par l'analyse (`analyze()`).
 
 - **Les congés sont déduits des heures à faire ; ils ne s'ajoutent pas aux heures travaillées.** Les heures prévues ne contiennent donc que des heures réellement planifiées sur des créneaux.
-- Les heures à faire ne dépendent que du contrat et des congés du mois : les heures sup. des mois précédents **n'y entrent pas** (voir 2.5).
+- Les heures à faire tiennent compte du compteur d'heures sup. des mois validés : les heures dues s'y ajoutent, les heures à rendre s'en retirent (voir 2.5).
 - La génération vise toujours les heures à faire. Les heures sup. du mois sont **calculées automatiquement** : heures prévues − heures à faire (contrat moins congés). Elles se recalculent à chaque changement du planning, y compris fait à la main : placer quelqu'un en plus fait apparaître des heures sup.
 - La carte de chaque salarié affiche « *heures prévues* sur *heures à faire* » et, en haut à droite, un badge `+Xh` (heures sup., vert-bleu) ou `−Xh` (heures en moins, orangé). La bulle du badge détaille le calcul et le cumul avec les mois validés. À côté, un second badge : « Congés restants : X » (solde de l'année de congés, orangé s'il est dépassé ; le détail du mois est dans la bulle). Les dimanches de repos manquants restent signalés dans « Points à vérifier ».
 - La génération automatique vise exactement les heures à faire (`T` dans `propose()`), et l'analyse les compare aux heures prévues (`analyze()`) : les deux utilisent la même formule (`targetOf()`).
